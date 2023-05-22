@@ -1,4 +1,4 @@
-//Yang Zhang 17.05.2023
+//Yang Zhang 22.05.2023
 
 #include "rational.h"
 #include <iostream>
@@ -14,6 +14,7 @@ void integer::init(long long int number)
     }
 
     //transfer into data
+    data.clear();
     while(number!=0){
         data.push_back(number % 256);
         number /=256;
@@ -23,6 +24,7 @@ void integer::init(long long int number)
 void integer::init(std::string hex_number)
 {
     //if the first char is negative sign then delete it and set positivity to be false
+    positivity=true;
     if(hex_number[0]=='-'){
         positivity=false;
         hex_number.erase(0,1);
@@ -31,6 +33,8 @@ void integer::init(std::string hex_number)
     //if the length is odd then add a 0 in front
     if(hex_number.length() %2)  hex_number="0"+hex_number;
 
+    //convert to array of unsigned char
+    data.clear();
     for(int i=hex_number.length()-1;i>=0;i-=2){
         //change the char in every entry into right hex number
         unsigned char temp1;
@@ -319,9 +323,54 @@ void integer::add_with(integer a)
 
 void integer::substract_with(integer a)
 {
-    this->add_with(a.negate_self());
+    this->add_with(a.negation());
 }
 
+void integer::multiply_with_256_power_n(int n)
+{
+    //shift every digit by n
+    data.insert(data.begin(),n,(unsigned char)0);
+}
+
+void integer::multiply_with_char(unsigned char a)
+{
+    //fast multiplication algorithm
+    if(a!=0){
+        integer temp;
+        temp.init(*this);   //copy the current number
+        if(a>1){
+            //this=this*(a/2)+this*(a/2)+this*(a%2)
+            this->multiply_with_char(a/2);
+            this->add_with(*this);
+            if(a%2) this->add_with(temp);
+        }
+    }else{  //if a==0
+        this->init(0);
+    }
+}
+
+void integer::multiply_with(integer a)
+{
+    //get the positivity of result and set it at last
+    bool result_positivity=!(positivity ^ a.is_positive());
+
+    //save the original number and clean self
+    integer start;
+    start.init(*this);
+    this->init(0);
+
+    //we do everything on the absolute values and set the positivity at last
+    start.absolute_value_self();
+    for(int i=0;i<a.get_data().size();i++){
+        //multiply by digits
+        integer temp;
+        temp.init(start);
+        temp.multiply_with_char(a.get_data()[i]);
+        temp.multiply_with_256_power_n(i);
+        this->add_with(temp);
+    }
+    positivity= result_positivity;
+}
 
 void integer::operator=(integer a)
 {
@@ -345,9 +394,15 @@ integer integer::operator-(integer a)
     return ans;
 }
 
-/*
+integer integer::operator*(integer a)
+{
+    integer ans;
+    ans.init(*this);
+    ans.multiply_with(a);
+    return ans;
+}
 
-integer operator*(integer a);
+/*
 
 integer operator/(integer a);
 

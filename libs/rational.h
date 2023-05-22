@@ -1,4 +1,4 @@
-//Yang Zhang 17.05.2023
+//Yang Zhang 22.05.2023
 //class of integers and rational numbers of arbitraty length
 
 #ifndef RATIONAL_H
@@ -60,6 +60,7 @@ class integer{
             //if the length is odd then add a 0 in front
             if(hex_number.length() %2)  hex_number="0"+hex_number;
 
+            //convert to array of unsigned char
             for(int i=hex_number.length()-1;i>=0;i-=2){
                 //change the char in every entry into right hex number
                 unsigned char temp1;
@@ -93,7 +94,7 @@ class integer{
         }
 
 
-        //initializing function, the same as the init in header
+        //initializing function, the same as the init in header but clear the data and positivity at first
         void init(long long int number);
 
         void init(std::string hex_number);
@@ -145,15 +146,18 @@ class integer{
 
         void substract_with(integer a);
 
+        //multiplication with 256^n
+        void multiply_with_256_power_n(int n);
+
+        //multiply with an unsigned char, considered as a positive integer with single digit
+        void multiply_with_char(unsigned char a);
+
         void multiply_with(integer a);
 
         //this acts like division of int, returns only integer
         void divide_with(integer a);
 
         void mod_with(integer a);
-
-        //multiplication with 256
-        void multiply_with_256(void);
 
         //-------------------------------------------------------------------
         //reload operators
