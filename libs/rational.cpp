@@ -1,9 +1,9 @@
-//Yang Zhang 22.05.2023
+//Yang Zhang 23.05.2023
 
 #include "rational.h"
 #include <iostream>
 
-void integer::init(long long int number)
+void bigint::init(long long int number)
 {
     //test the positivity
     if(number<0){
@@ -21,7 +21,7 @@ void integer::init(long long int number)
     }
 }
 
-void integer::init(std::string hex_number)
+void bigint::init(std::string hex_number)
 {
     //if the first char is negative sign then delete it and set positivity to be false
     positivity=true;
@@ -51,7 +51,7 @@ void integer::init(std::string hex_number)
             temp2=hex_number[i-1]-'a'+10;
         }
 
-        //convert to the entry of the integer
+        //convert to the entry of the bigint
         data.push_back(temp2*16+temp1);
     }
 
@@ -63,25 +63,25 @@ void integer::init(std::string hex_number)
     if(data.empty())    positivity=true;
 }
 
-void integer::init(integer a)
+void bigint::init(bigint a)
 {
     positivity=a.is_positive();
     data=a.get_data();
 }
 
 //-------------------------------------------------------------------
-std::vector<unsigned char> integer::get_data(void)
+std::vector<unsigned char> bigint::get_data(void)
 {
     return data;
 }
 
-bool integer::is_positive(void)
+bool bigint::is_positive(void)
 {
     return positivity;
 }
 
 //-------------------------------------------------------------------
-void integer::print_hex(void)
+void bigint::print_hex(void)
 {   
     //print negative sign
     if(!positivity) std::cout<<"-";
@@ -89,8 +89,8 @@ void integer::print_hex(void)
     //two temp digits
     unsigned char temp1,temp2;           
 
-    //if is zero, print zero
-    if(data.size()==0)  std::cout<<'0';
+    //if is zero, there is no data in array, so print zero
+    if(this->is_zero())  std::cout<<'0';
 
     //print every digit in hex
     for(int i=data.size()-1;i>=0;i--){
@@ -116,27 +116,27 @@ void integer::print_hex(void)
     }
 }
 
-void integer::negate_self(void)
+void bigint::negate_self(void)
 {
     positivity=!positivity;
 }
 
-void integer::absolute_value_self(void)
+void bigint::absolute_value_self(void)
 {
     positivity=true;
 }
 
-integer integer::negation(void)
+bigint bigint::negation(void)
 {
-    integer ans;
+    bigint ans;
     ans.init(*this);
     ans.negate_self();
     return ans;
 }
 
-integer integer::absolute_value(void)
+bigint bigint::absolute_value(void)
 {
-    integer ans;
+    bigint ans;
     ans.init(*this);
     ans.absolute_value_self();
     return ans;
@@ -144,7 +144,12 @@ integer integer::absolute_value(void)
 
 
 //-------------------------------------------------------------------
-bool integer::larger_than(integer a)
+bool bigint::is_zero(void)
+{
+    return data.empty();
+}
+
+bool bigint::larger_than(bigint a)
 {
 
     //this>=0, a<0
@@ -189,7 +194,7 @@ bool integer::larger_than(integer a)
     return false;
 }
 
-bool integer::is_equal(integer a)
+bool bigint::is_equal(bigint a)
 {
     //if the positivity are different;
     if(positivity!= a.is_positive())    return false;
@@ -207,7 +212,7 @@ bool integer::is_equal(integer a)
 }
 
 //we can combine the former two functions, but rewriting it again can save operating time
-bool integer::larger_equal_than(integer a)
+bool bigint::larger_equal_than(bigint a)
 {
     //this>=0, a<0
     if(positivity && !a.is_positive())  return true;
@@ -251,18 +256,18 @@ bool integer::larger_equal_than(integer a)
     return true;
 }
 
-bool integer::smaller_than(integer a)
+bool bigint::smaller_than(bigint a)
 {
     return !this->larger_equal_than(a);
 }
 
-bool integer::smaller_equal_than(integer a)
+bool bigint::smaller_equal_than(bigint a)
 {
     return !this->larger_than(a);
 }
 
 //-------------------------------------------------------------------
-void integer::add_with(integer a)
+void bigint::add_with(bigint a)
 {
     std::vector<unsigned char> a_data=a.get_data();
 
@@ -321,22 +326,26 @@ void integer::add_with(integer a)
     
 }
 
-void integer::substract_with(integer a)
+void bigint::substract_with(bigint a)
 {
     this->add_with(a.negation());
 }
 
-void integer::multiply_with_256_power_n(int n)
+void bigint::multiply_with_256_power_n(int n)
 {
-    //shift every digit by n
-    data.insert(data.begin(),n,(unsigned char)0);
+    //if the integer itself is 0 then do nothing
+    if(!this->is_zero()){
+        //shift every digit by n
+        data.insert(data.begin(),n,(unsigned char)0);
+    }
 }
 
-void integer::multiply_with_char(unsigned char a)
+void bigint::multiply_with_char(unsigned char a)
 {
     //fast multiplication algorithm
+    //I'm not sure whether this is faster than digit multiplication, but I'm too lazy to write digit multiplication
     if(a!=0){
-        integer temp;
+        bigint temp;
         temp.init(*this);   //copy the current number
         if(a>1){
             //this=this*(a/2)+this*(a/2)+this*(a%2)
@@ -349,13 +358,13 @@ void integer::multiply_with_char(unsigned char a)
     }
 }
 
-void integer::multiply_with(integer a)
+void bigint::multiply_with(bigint a)
 {
     //get the positivity of result and set it at last
     bool result_positivity=!(positivity ^ a.is_positive());
 
     //save the original number and clean self
-    integer start;
+    bigint start;
     start.init(*this);
     this->init(0);
 
@@ -363,7 +372,7 @@ void integer::multiply_with(integer a)
     start.absolute_value_self();
     for(int i=0;i<a.get_data().size();i++){
         //multiply by digits
-        integer temp;
+        bigint temp;
         temp.init(start);
         temp.multiply_with_char(a.get_data()[i]);
         temp.multiply_with_256_power_n(i);
@@ -372,64 +381,211 @@ void integer::multiply_with(integer a)
     positivity= result_positivity;
 }
 
-void integer::operator=(integer a)
+void bigint::divide_with(bigint a)
+{
+    //if self is zero then do nothing
+    //if a is zero then return 0
+    if(a.is_zero()){
+        this->init(0);
+    }else if(!this->is_zero()){
+        //get the positivity of final result
+        bool result_positivity=!(positivity ^ a.is_positive());
+
+        //take absolute values
+        this->absolute_value_self();
+        a.absolute_value_self();
+
+        //if this<a output 0
+        if(*this< a){
+            this->init(0);
+        }else{
+            //divide by each digit, overdigit is a flag and ans is output
+            bool overdigit=0;
+            bigint ans(0);
+            while(*this>=a){
+                //start with a guess by dividing the leading digits
+                //say 3456/234, we start then with 3/2*10, where 10 is the difference between the size of self and a.
+                //note it is possible like in case 2345/456 that we have to consider the first two digits of self,
+                //where we guess it should be around (23/4)
+                //we first treat the first case, when we get something left in the leading digit, we set the flag
+                //overdigit to be 1 and consider the second case.
+                bigint guess;
+                if(overdigit){
+                    guess.init((((long long)data.back()*256)+(long long)data[data.size()-2])/(long long)a.get_data().back());
+                    if(data.size()>a.get_data().size()+1){
+                        guess.multiply_with_256_power_n(data.size()-a.get_data().size()-1);
+                    }
+                }else{
+                    guess.init(((long long)data.back())/(long long)a.get_data().back());
+                    //if the guess is zero (like for 2345/456 we have 2/4=0) then we set the overdigit flag and go to next round
+                    if(guess.is_zero()){
+                        overdigit=1;
+                        continue;
+                    }
+                    if(data.size()>a.get_data().size()){
+                        guess.multiply_with_256_power_n(data.size()-a.get_data().size());
+                    }
+                }
+
+                //factor=256^n here
+                bigint factor(1);
+                factor.multiply_with_256_power_n(data.size()-a.get_data().size()-overdigit);
+
+                //the temps is used to save time
+                bigint temp1,temp2;
+                temp1.init(guess*a);
+                temp2.init(a);
+                temp2.multiply_with_256_power_n(data.size()-a.get_data().size()-overdigit);
+
+                //if the guess is too large, reduce each time by 1 (the factor here)
+                if(guess*a>*this){
+                    /*we use temp1 to substitute guess*a and temp2 to substitute factor*a
+                    this is equivalent to
+
+                    while(guess*a>*this){
+                        guess.substract_with(factor);
+                    }
+
+                    since when guess get substracted with factor, guess*a get substracted with factor*a,
+                    but we do not need to do multiplication every time
+                    */
+                    while(temp1>*this){
+                        guess.substract_with(factor);
+                        temp1.substract_with(temp2);
+                    }
+
+                //if the guess is too small, add each time by 1 (the factor here)
+                }else if(guess*a<*this){
+                    /*we use temp1 to substitute guess*a and temp2 to substitute factor*a
+                    this is equivalent to
+
+                    while(guess*a<*this){
+                        guess.add_with(factor);
+                    }
+
+                    since when guess get added with factor, guess*a get added with factor*a,
+                    but we do not need to do multiplication every time
+                    */
+                    while(temp1<*this){
+                        guess.add_with(factor);
+                        temp1.add_with(temp2);
+                    }
+                    //at last temp1 will exceed self, so as the guess, so we neew to substract once
+                    guess.substract_with(factor);
+                    temp1.substract_with(temp2);
+                }
+
+                //if we have some number left in the leading coefficient then set the flag overdigit
+                if(temp1.is_zero() or temp1.get_data().back()!=data.back()){
+                    overdigit=1;
+                }else{
+                    overdigit=0;
+                }
+                this->substract_with(temp1);
+                ans.add_with(guess);
+            }
+            //take the result
+            this->init(ans);
+            positivity=result_positivity;
+        }
+    }
+}
+
+void bigint::mod_with(bigint a)
+{
+    this->substract_with((*this/a)*a);
+    if (*this<0)    this->add_with(a);
+}
+
+//-----------------------------)--------------------------------------
+void bigint::operator=(bigint a)
 {
     this->data=a.get_data();
     this->positivity=a.is_positive();
 }
 
-integer integer::operator+(integer a)
+bigint bigint::operator+(bigint a)
 {
-    integer ans;
+    bigint ans;
     ans.init(*this);
     ans.add_with(a);
     return ans;
 }
 
-integer integer::operator-(integer a)
+bigint bigint::operator-(bigint a)
 {
-    integer ans;
+    bigint ans;
     ans.init(*this);
     ans.substract_with(a);
     return ans;
 }
 
-integer integer::operator*(integer a)
+bigint bigint::operator*(bigint a)
 {
-    integer ans;
+    bigint ans;
     ans.init(*this);
     ans.multiply_with(a);
     return ans;
 }
 
-/*
+bigint bigint::operator/(bigint a){
+    bigint ans;
+    ans.init(*this);
+    ans.divide_with(a);
+    return ans;
+}
 
-integer operator/(integer a);
+bigint bigint::operator%(bigint a){
+    bigint ans;
+    ans.init(*this);
+    ans.mod_with(a);
+    return ans;
+}
 
-integer operator%(integer a);
-*/
-
-bool integer::operator>(integer a)
+bool bigint::operator>(bigint a)
 {
     return this->larger_than(a);
 }
 
-bool integer::operator<(integer a)
+bool bigint::operator<(bigint a)
 {
     return this->smaller_than(a);
 }
 
-bool integer::operator==(integer a)
+bool bigint::operator==(bigint a)
 {
     return this->is_equal(a);
 }
 
-bool integer::operator>=(integer a)
+bool bigint::operator!=(bigint a)
+{
+    return !this->is_equal(a);
+}
+
+bool bigint::operator>=(bigint a)
 {
     return this->larger_equal_than(a);
 }
 
-bool integer::operator<=(integer a)
+bool bigint::operator<=(bigint a)
 {
     return this->smaller_equal_than(a);
+}
+
+bigint bigint_gcd(bigint a, bigint b)
+{
+    a.absolute_value_self();
+    b.absolute_value_self();
+
+    //Euclidean 
+    if (a<b) std::swap(a,b);
+    bigint c;
+    c.init(a%b);
+    if (c.is_zero())    return b;
+    return bigint_gcd(b, c);
+}
+
+bigint bigint_lcm(bigint a, bigint b)
+{
+    return a*b/bigint_gcd(a,b);
 }
