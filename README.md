@@ -1,6 +1,6 @@
 # Rational Point on Elliptic Curves
 
-last update: 22.05.2023
+last update: 23.05.2023
 Author:Yang Zhang
 
 This is an open-source C++ algorithm to compute Q-rational points on an elliptic curve defined over the field Q. To support the algorithm, a library of integers with arbitrary length and rational numbers with arbitrarily long numerators and denominators is attached.
