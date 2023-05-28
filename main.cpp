@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include "ECcurve.h"
+#include "test.h"
 
 //read a bigrat number from stdin stream, name is used to instruct the user, which can be NULL
 bigrat input_bigrat(std::string name)

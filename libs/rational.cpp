@@ -356,6 +356,7 @@ void bigint::multiply_with_char(unsigned char a)
     //fast multiplication algorithm
     //I'm not sure whether this is faster than digit multiplication, but I'm too lazy to write digit multiplication
     if(a!=0){
+        /*
         bigint temp;
         temp.init(*this);   //copy the current number
         if(a>1){
@@ -363,6 +364,16 @@ void bigint::multiply_with_char(unsigned char a)
             this->multiply_with_char(a/2);
             this->add_with(*this);
             if(a%2) this->add_with(temp);
+        }
+        */
+        unsigned short carry_digit=0;
+        for(int i=0;i<data.size();i++){
+            unsigned short temp= ((unsigned short)a* (unsigned short) data[i])+carry_digit;
+            data[i]=(unsigned char)(temp%256);
+            carry_digit=temp/256;
+        }
+        if(carry_digit !=0){
+            data.push_back((unsigned char) carry_digit);
         }
     }else{  //if a==0
         this->init(0);
