@@ -80,7 +80,7 @@ void compute_rational_points(void)
 int main(void)
 {
     compute_rational_points();
-    std::cout << "Press any key to continue";
-    std::cin.get();
+    std::cout << "Press Enter to continue";
+    getchar(); getchar();
     return 0;
 }
