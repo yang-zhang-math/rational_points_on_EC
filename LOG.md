@@ -1,3 +1,6 @@
+# 28.05.2023
+Add rational numbers and their arithmetic. Add the class of cubic curves. Done with the basic construction. The program now is usable, but may not be free from bugs.
+
 # 23.05.2023
 Add division and gcd, lcm. Now the big integer part is complete.
 
