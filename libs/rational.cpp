@@ -2,7 +2,7 @@
  * This is a file in the project rational_points_on_EC
  * https://github.com/yang-zhang-math/rational_points_on_EC
  * class of integers and rational numbers of arbitraty length
- * Licensed under GNU v3.0
+ * Licensed under GNU General Public License v3.0
  */
 
 #include "rational.h"
@@ -328,7 +328,9 @@ void bigint::add_with(bigint a)
             }
         }
         //remove all 0 digits
-        while(data.back()==0)   data.pop_back();
+        if(!data.empty()){
+            while(data.back()==0)   data.pop_back();
+        }
         
     }
 
@@ -484,14 +486,19 @@ void bigint::divide_with(bigint a)
                     temp1.substract_with(temp2);
                 }
 
-                //if we have some number left in the leading coefficient then set the flag overdigit
-                if(temp1.is_zero() or temp1.get_data().back()!=data.back()){
+                //get the size of the current data
+                int previous_datasize=data.size();
+                //take this substracted with temp1, which is guess*a, and let ans get added with guess
+                this->substract_with(temp1);
+                ans.add_with(guess);
+
+                //if the new size is the same, which means that there are something left in the leading digit
+                //then we set overdigit to be 1
+                if(data.size()==previous_datasize){
                     overdigit=1;
                 }else{
                     overdigit=0;
                 }
-                this->substract_with(temp1);
-                ans.add_with(guess);
             }
             //take the result
             this->init(ans);
@@ -606,6 +613,7 @@ bigint bigint_gcd(bigint a, bigint b)
 
     //Euclidean 
     if (a<b) std::swap(a,b);
+    if(b.is_zero())     return a;
     bigint c;
     c.init(a%b);
     if (c.is_zero())    return b;
@@ -655,6 +663,21 @@ void bigrat::init(int num, int denom)
 
 void bigrat::init(bigint num, bigint denom)
 {
+    numerator.init(num);
+    denominator.init(denom);
+
+    if(denominator.is_zero())
+        denominator.init(1);
+    
+    if(!denominator.is_positive()){
+        denominator.negate_self();
+        numerator.negate_self();
+    }
+
+    this->reduce_fraction();
+}
+
+void bigrat::init(std::string num, std::string denom){
     numerator.init(num);
     denominator.init(denom);
 

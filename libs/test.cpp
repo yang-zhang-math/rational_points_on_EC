@@ -2,7 +2,7 @@
  * This is a file in the project rational_points_on_EC
  * https://github.com/yang-zhang-math/rational_points_on_EC
  * test of the bigint class and bigrat class
- * Licensed under GNU v3.0
+ * Licensed under GNU General Public License v3.0
  */
 
 #include "test.h"
@@ -45,4 +45,26 @@ void bigrat_test()
     e.print_hex(); std::cout<<std::endl;
     f.print_hex(); std::cout<<std::endl;
     g.print_hex(); std::cout<<std::endl;
+}
+
+//test the output using curve X^3+Y^3=1141
+void ec_test(void)
+{
+    bigrat bigrat_zero(0,1);
+    bigrat bigrat_one(1,1);
+    bigrat bigrat_1141(-1141,1);
+    bigrat bigrat_20(20,1);
+    bigrat bigrat_19(-19,1);
+    ec curve(bigrat_one,bigrat_zero,bigrat_zero,bigrat_one,bigrat_zero,bigrat_zero,bigrat_zero,bigrat_zero,bigrat_zero,bigrat_1141);
+    point pt;
+    pt.X=bigrat_20;
+    pt.Y=bigrat_19;
+    for(int i=0;i<5;i++){
+        pt=curve.third_intersection_point(curve.tangent_at_pt(pt),pt);
+        std::cout << i << ": X:" << std::endl;
+        pt.X.print_hex();
+        std::cout << "Y:" << std::endl;
+        pt.Y.print_hex();
+        std::cout << curve.is_pt_on_curve(pt) << std::endl;
+    }
 }

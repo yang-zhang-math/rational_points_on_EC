@@ -2,7 +2,7 @@
  * This is a file in the project rational_points_on_EC
  * https://github.com/yang-zhang-math/rational_points_on_EC
  * class of integers and rational numbers of arbitraty length
- * Licensed under GNU v3.0
+ * Licensed under GNU General Public License v3.0
  */
 
 #ifndef RATIONAL_H
@@ -275,6 +275,23 @@ class bigrat{
             this->reduce_fraction();
         }
 
+        //initialize with string_hex numerator and denominator
+        //if input denom=0, we set denominator to be 1
+        bigrat(std::string num, std::string denom){
+            numerator.init(num);
+            denominator.init(denom);
+
+            if(denominator.is_zero())
+                denominator.init(1);
+            
+            if(!denominator.is_positive()){
+                denominator.negate_self();
+                numerator.negate_self();
+            }
+
+            this->reduce_fraction();
+        }
+
         //initializing functions, the same as the init functions in the header but clear all data at first
 
         void init(void);
@@ -282,6 +299,8 @@ class bigrat{
         void init(int num, int denom);
 
         void init(bigint num, bigint denom);
+
+        void init(std::string num, std::string denom);
 
         //init with another bigrat number
         void init(bigrat a);
