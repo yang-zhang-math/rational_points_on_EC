@@ -1,4 +1,9 @@
-//Yang Zhang 23.05.2023
+/**Yang Zhang 28.05.2023
+ * This is a file in the project rational_points_on_EC
+ * https://github.com/yang-zhang-math/rational_points_on_EC
+ * class of integers and rational numbers of arbitraty length
+ * Licensed under GNU v3.0
+ */
 
 #include "rational.h"
 #include <iostream>
@@ -70,6 +75,7 @@ void bigint::init(bigint a)
 }
 
 //-------------------------------------------------------------------
+
 std::vector<unsigned char> bigint::get_data(void)
 {
     return data;
@@ -81,6 +87,7 @@ bool bigint::is_positive(void)
 }
 
 //-------------------------------------------------------------------
+
 void bigint::print_hex(void)
 {   
     //print negative sign
@@ -144,6 +151,7 @@ bigint bigint::absolute_value(void)
 
 
 //-------------------------------------------------------------------
+
 bool bigint::is_zero(void)
 {
     return data.empty();
@@ -267,6 +275,7 @@ bool bigint::smaller_equal_than(bigint a)
 }
 
 //-------------------------------------------------------------------
+
 void bigint::add_with(bigint a)
 {
     std::vector<unsigned char> a_data=a.get_data();
@@ -493,15 +502,31 @@ void bigint::divide_with(bigint a)
 
 void bigint::mod_with(bigint a)
 {
-    this->substract_with((*this/a)*a);
-    if (*this<0)    this->add_with(a);
+    if(!this->is_zero())
+    {
+        this->substract_with((*this/a)*a);
+        if (*this<0)    this->add_with(a);
+    }
 }
 
-//-----------------------------)--------------------------------------
+void bigint::exp_with(int n)
+{
+    //fast exponential algorithm
+    if(n!=1){
+        bigint temp;
+        temp.init(*this);
+        this->exp_with(n/2);
+        this->multiply_with(*this);
+        if(n%2)
+            this->multiply_with(temp);
+    }
+}
+
+//-------------------------------------------------------------------
+
 void bigint::operator=(bigint a)
 {
-    this->data=a.get_data();
-    this->positivity=a.is_positive();
+    this->init(a);
 }
 
 bigint bigint::operator+(bigint a)
@@ -572,6 +597,8 @@ bool bigint::operator<=(bigint a)
     return this->smaller_equal_than(a);
 }
 
+//-------------------------------------------------------------------
+
 bigint bigint_gcd(bigint a, bigint b)
 {
     a.absolute_value_self();
@@ -588,4 +615,287 @@ bigint bigint_gcd(bigint a, bigint b)
 bigint bigint_lcm(bigint a, bigint b)
 {
     return a*b/bigint_gcd(a,b);
+}
+
+bigint bigint_a_exp_with_n(bigint a, int n)
+{
+    bigint ans;
+    ans.init(a);
+    ans.exp_with(n);
+    return ans;
+}
+
+
+
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+
+void bigrat::init(void)
+{
+    numerator.init(0);
+    denominator.init(1);
+}
+
+void bigrat::init(int num, int denom)
+{
+    numerator.init(num);
+    denominator.init(denom);
+
+    if(denominator.is_zero())
+        denominator.init(1);
+    
+    if(!denominator.is_positive()){
+        denominator.negate_self();
+        numerator.negate_self();
+    }
+
+    this->reduce_fraction();
+}
+
+void bigrat::init(bigint num, bigint denom)
+{
+    numerator.init(num);
+    denominator.init(denom);
+
+    if(denominator.is_zero())
+        denominator.init(1);
+    
+    if(!denominator.is_positive()){
+        denominator.negate_self();
+        numerator.negate_self();
+    }
+
+    this->reduce_fraction();
+}
+
+void bigrat::init(bigrat a)
+{
+    numerator=a.get_numerator();
+    denominator=a.get_denominator();
+}
+
+//-------------------------------------------------------------------
+
+bigint bigrat::get_numerator(void)
+{
+    return numerator;
+}
+
+bigint bigrat::get_denominator(void)
+{
+    return denominator;
+}
+
+//-------------------------------------------------------------------
+
+void bigrat::print_hex(void)
+{
+    std::cout << "Numerator:" << std::endl;
+    numerator.print_hex();
+    std::cout << std::endl << "Denominator:" << std::endl;
+    denominator.print_hex();
+    std::cout << std::endl;
+}
+
+void bigrat::reduce_fraction(void)
+{
+    bigint gcd=bigint_gcd(numerator,denominator);
+    numerator.divide_with(gcd);
+    denominator.divide_with(gcd);
+}
+
+void bigrat::negate_self(void)
+{
+    numerator.negate_self();
+}
+
+void bigrat::absolute_value_self(void)
+{
+    numerator.absolute_value_self();
+}
+
+void bigrat::invert_self(void)
+{
+    if(!this->is_zero()){
+        std::swap(numerator,denominator);
+
+        if(!denominator.is_positive()){
+            denominator.negate_self();
+            numerator.negate_self();
+        }
+    }
+}
+
+bigrat bigrat::negation(void)
+{
+    bigrat ans;
+    ans.init(*this);
+    ans.negate_self();
+    return ans;
+}
+
+bigrat bigrat::absolute_value(void)
+{
+    bigrat ans;
+    ans.init(*this);
+    ans.absolute_value_self();
+    return ans;
+}
+
+bigrat bigrat::inverse(void)
+{
+    bigrat ans;
+    ans.init(*this);
+    ans.invert_self();
+    return ans;
+}
+
+//-------------------------------------------------------------------
+
+bool bigrat::is_zero(void)
+{
+    return numerator.is_zero();
+}
+
+bool bigrat::is_one(void)
+{
+    return (numerator==denominator);
+}
+
+bool bigrat::larger_than(bigrat a)
+{
+    return (numerator*a.get_denominator()) > (denominator*a.get_numerator());
+}
+
+bool bigrat::is_equal(bigrat a)
+{
+    return (numerator==a.get_numerator()) and (denominator==a.get_denominator());
+}
+
+bool bigrat::larger_equal_than(bigrat a)
+{
+    return (numerator*a.get_denominator()) >= (denominator*a.get_numerator());
+}
+
+bool bigrat::smaller_than(bigrat a)
+{
+    return !this->larger_equal_than(a);
+}
+
+bool bigrat::smaller_equal_than(bigrat a)
+{
+    return !this->larger_than(a);
+}
+
+//-------------------------------------------------------------------
+
+void bigrat::add_with(bigrat a)
+{
+    numerator.multiply_with(a.get_denominator());
+    numerator.add_with(a.get_numerator()*denominator);
+    denominator.multiply_with(a.get_denominator());
+    this->reduce_fraction();
+}
+
+void bigrat::substract_with(bigrat a)
+{
+    this->add_with(a.negation());
+}
+
+void bigrat::multiply_with(bigrat a)
+{
+    numerator.multiply_with(a.get_numerator());
+    denominator.multiply_with(a.get_denominator());
+    this->reduce_fraction();
+}
+
+void bigrat::divide_with(bigrat a)
+{
+    if(!a.is_zero()){
+        this->multiply_with(a.inverse());
+    }
+}
+
+void bigrat::exp_with(int n)
+{
+    numerator.exp_with(n);
+    denominator.exp_with(n);
+}
+
+void bigrat::operator=(bigrat a)
+{
+    this->init(a);
+}
+
+bigrat bigrat::operator+(bigrat a)
+{
+    bigrat ans;
+    ans.init(*this);
+    ans.add_with(a);
+    return ans;
+}
+
+bigrat bigrat::operator-(bigrat a)
+{
+    bigrat ans;
+    ans.init(*this);
+    ans.substract_with(a);
+    return ans;
+}
+
+bigrat bigrat::operator*(bigrat a)
+{
+    bigrat ans;
+    ans.init(*this);
+    ans.multiply_with(a);
+    return ans;
+}
+
+bigrat bigrat::operator/(bigrat a)
+{
+    bigrat ans;
+    ans.init(*this);
+    ans.divide_with(a);
+    return ans;
+}
+
+bool bigrat::operator>(bigrat a)
+{
+    return this->larger_than(a);
+}
+
+bool bigrat::operator<(bigrat a)
+{
+    return this->smaller_than(a);
+}
+
+bool bigrat::operator==(bigrat a)
+{
+    return this->is_equal(a);
+}
+
+bool bigrat::operator!=(bigrat a)
+{
+    return !this->is_equal(a);
+}
+
+bool bigrat::operator>=(bigrat a)
+{
+    return this->larger_equal_than(a);
+}
+
+bool bigrat::operator<=(bigrat a)
+{
+    return this->smaller_equal_than(a);
+}
+
+//-------------------------------------------------------------------
+
+bigrat bigrat_a_exp_with_n(bigrat a, int n)
+{
+    bigrat ans;
+    ans.init(a);
+    ans.exp_with(n);
+    return ans;
 }

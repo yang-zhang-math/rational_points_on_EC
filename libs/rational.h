@@ -1,5 +1,9 @@
-//Yang Zhang 23.05.2023
-//class of integers and rational numbers of arbitraty length
+/**Yang Zhang 28.05.2023
+ * This is a file in the project rational_points_on_EC
+ * https://github.com/yang-zhang-math/rational_points_on_EC
+ * class of integers and rational numbers of arbitraty length
+ * Licensed under GNU v3.0
+ */
 
 #ifndef RATIONAL_H
 #define RATIONAL_H
@@ -94,6 +98,7 @@ class bigint{
         }
 
         //initializing function, the same as the init in header but clear the data and positivity at first
+
         void init(long long int number);
 
         void init(std::string hex_number);
@@ -112,13 +117,13 @@ class bigint{
 
         //-------------------------------------------------------------------
         //print the number in hex
-        void print_hex();
+        void print_hex(void);
 
         //make self to be the negation
-        void negate_self();
+        void negate_self(void);
 
         //make self to be the absolute value
-        void absolute_value_self();
+        void absolute_value_self(void);
 
         //take negation, does not change self data
         bigint negation(void);
@@ -143,8 +148,8 @@ class bigint{
 
         //-------------------------------------------------------------------
         //algebraic operations
-
         //the operations will cover the original data, e.g. this->add_with(a) is the same as this+=a
+
         void add_with(bigint a);
 
         void substract_with(bigint a);
@@ -166,9 +171,12 @@ class bigint{
         //example: 13%4=1, -13%4=3
         void mod_with(bigint a);
 
+        //let self get exponentiated with power n
+        void exp_with(int n);
+
         //-------------------------------------------------------------------
         //reload operators
-        //do not provide += and similar things, for this please use the algebraic operations below;
+        //do not provide += and similar things, for this please use the algebraic operations above;
 
         void operator=(bigint a);
 
@@ -204,5 +212,180 @@ bigint bigint_gcd(bigint a, bigint b);
 //least common multiplier of the *ABSOLUTE VALUE* of a and b
 bigint bigint_lcm(bigint a, bigint b);
 
+/** exponential, return a^n
+ *  \param a the base
+ *  \param n the exponent
+ */
+bigint bigint_a_exp_with_n(bigint a, int n);
+
+
+
+//class of rational numbers
+//the positivity is saved in numerator, and denominator should be always positive
+
+class bigrat{
+
+    private:
+
+        //the numerator
+        bigint numerator;
+
+        //the denominator
+        bigint denominator;
+
+    public:
+        
+        //initialize as zero
+        bigrat(void){
+            numerator.init(0);
+            denominator.init(1);
+        }
+
+        //initialize with integer numerator and denominator
+        //if input denom=0, we set denominator to be 1
+        bigrat(int num, int denom){
+            numerator.init(num);
+            denominator.init(denom);
+
+            if(denominator.is_zero())
+                denominator.init(1);
+            
+            if(!denominator.is_positive()){
+                denominator.negate_self();
+                numerator.negate_self();
+            }
+
+            this->reduce_fraction();
+        }
+
+        //initialize with bigint numerator and denominator
+        //if input denom=0, we set denominator to be 1
+        bigrat(bigint num, bigint denom){
+            numerator.init(num);
+            denominator.init(denom);
+
+            if(denominator.is_zero())
+                denominator.init(1);
+            
+            if(!denominator.is_positive()){
+                denominator.negate_self();
+                numerator.negate_self();
+            }
+
+            this->reduce_fraction();
+        }
+
+        //initializing functions, the same as the init functions in the header but clear all data at first
+
+        void init(void);
+
+        void init(int num, int denom);
+
+        void init(bigint num, bigint denom);
+
+        //init with another bigrat number
+        void init(bigrat a);
+
+        //-------------------------------------------------------------------
+        //get the data
+
+        //get the numerator
+        bigint get_numerator(void);
+
+        //get the denominator
+        bigint get_denominator(void);
+
+        //-------------------------------------------------------------------
+        //print the number in hex
+        void print_hex(void);
+
+        //let the numerator and denominator divided by their gcd
+        void reduce_fraction(void);
+
+        //make self to be the negation
+        void negate_self(void);
+
+        //make self to be the absolute value
+        void absolute_value_self(void);
+
+        //make self to be the multiplicative inverse, if self is zero, return zero
+        void invert_self(void);
+
+        //take negation, does not change self data
+        bigrat negation(void);
+
+        //take absolute value, does not change self data
+        bigrat absolute_value(void);
+
+        //take multiplicative inverse, does not change self data, if self is zero, return zero
+        bigrat inverse(void);
+
+        //-------------------------------------------------------------------
+        //compare two numbers
+
+        bool is_zero(void);
+
+        bool is_one(void);
+
+        bool larger_than(bigrat a);
+
+        bool is_equal(bigrat a);
+
+        bool larger_equal_than(bigrat a);
+
+        bool smaller_than(bigrat a);
+
+        bool smaller_equal_than(bigrat a);
+
+        //-------------------------------------------------------------------
+        //algebraic operations
+        //the operations will cover the original data, e.g. this->add_with(a) is the same as this+=a
+
+        void add_with(bigrat a);
+
+        void substract_with(bigrat a);
+
+        void multiply_with(bigrat a);
+
+        //this will do nothing if a==0;
+        void divide_with(bigrat a);
+
+        //let self get exponentiated with power n
+        void exp_with(int n);
+
+        //-------------------------------------------------------------------
+        //reload operators
+        //do not provide += and similar things, for this please use the algebraic operations above;
+
+        void operator=(bigrat a);
+
+        bigrat operator+(bigrat a);
+
+        bigrat operator-(bigrat a);
+
+        bigrat operator*(bigrat a);
+
+        bigrat operator/(bigrat a);
+
+        bool operator>(bigrat a);
+
+        bool operator<(bigrat a);
+
+        bool operator==(bigrat a);
+
+        bool operator!=(bigrat a);
+
+        bool operator>=(bigrat a);
+
+        bool operator<=(bigrat a);
+};
+
+//further operations
+
+/** exponential, return a^n
+ *  \param a the base
+ *  \param n the exponent
+ */
+bigrat bigrat_a_exp_with_n(bigrat a, int n);
 
 #endif

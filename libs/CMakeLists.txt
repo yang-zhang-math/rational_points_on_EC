@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 
 
-add_library(libs STATIC rational.cpp)
+add_library(libs STATIC rational.cpp test.cpp)
 
 target_include_directories(libs PUBLIC ./)
 
