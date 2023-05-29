@@ -244,7 +244,7 @@ This is one of the fundamental tools we need to proceed the algorithm, so let us
 We now give a complete description on the mathematical details in the algorithm.\\
 Let $f=ax^3+bx^2y+cxy^2+dy^3+ex^2+fxy+gy^2+hx+iy+j=0$ be the equation of the cubic curve over $\bQ$. (We again use the abuse of notations between affine equations and projective equations here.) The tangent line at $(x_0,y_0)$ is then given by
 \[
-	\frac{\partial f}{\partial x}(x_0,y_0) \cdot x + \frac{\partial f}{\partial y}(x_0,y_0) \cdot y + c = 0,
+	\frac{\partial f}{\partial x}(x_0,y_0) \cdot x + \frac{\partial f}{\partial y}(x_0,y_0) \cdot y + k = 0,
 \]
 where $k$ is a constant. We pick $k$ correctly such that $(x_0,y_0)$ is indeed on the line. Denote $\frac{\partial f}{\partial x}(x_0,y_0) = u$, $\frac{\partial f}{\partial y}(x_0,y_0) = v$. The tangent equation can be then written as $ux+vy+k=0$. Now by B\'ezout, the tangent line will intersect with the cubic at three point, but we know they intersect each other at $(x_0,y_0)$ with multiplicity two, so there is at most one extra intersection point.\\
 However, there are two obstructions. The first one is that B\'ezout only works over an algebraically closed field but not necessarily over $\bQ$. The second one is that B\'ezout only works over projective plane, but we only consider the affine plane where $Z\neq 0$. We will see that the first obstruction actually will not happen, but the second one may indeed be a problem.\\
