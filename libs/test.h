@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include "rational.h"
-#include "ECCurve.h"
+#include "ECcurve.h"
 
 void bigint_test(void);
 void bigrat_test(void);
