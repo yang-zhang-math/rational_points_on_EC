@@ -18,7 +18,7 @@ When computing the tangent line and the new point, the size of numerators and de
 I don't like it. I hope to make the program as light weight and easy to use as possible. It may take hours for C++ beginners to set up their own environment with OpenSSL. A majority of pure mathematicians is not familiar with C++ and OpenSSL, and I just hope that they can use it directly with a simple C++ compiler.
 
 # How to use?
-You can find the executable file for macOS and Windows in the folder ./release <br />
+You can find the executable file for MacOS and Windows in the folder ./release <br />
 If you want to compile the program by yourself: <br />
 If you have a C++ building environment with CMake, then just download the whole repository and build the main.cpp. You will find an executable file in the folder ./build <br />
 If you do not have a CMake, then copy all the .h and .cpp files in the folder ./libs to the same directory of main.cpp, and compile main.cpp with any simple C++ compiler.
