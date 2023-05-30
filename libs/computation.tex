@@ -226,7 +226,7 @@ It is however not true that given any curve $F=0$ on $\bP^2$, it is smooth. The 
 	\end{align*}
 \end{prop}
 Note that we have defined a curve over an arbitrary field, so the partial derivative of a polynomial with coefficients in the field does not necessarily make sense in analysis. They are rather called "formal derivatives", which are done in the same way as one does to $\bR$-polynomials, but have no meaning in differentials.\\
-In the algorithm, when one gives a cubic polynomial, it will not be checked that the curve is smooth everywhere, since the computation of many quadric and cubic functions is too complicated.
+In the algorithm, when one gives a cubic polynomial, it will not be checked whether the curve is smooth everywhere, since the computation of many quadric and cubic functions is too complicated.
 
 \section{B\'ezout's theorem}
 \begin{thm}[B\'ezout's theorem]
@@ -265,7 +265,7 @@ Now assume $(x_0,y_0)$ is smooth and $v\neq 0$. Indeed, if $v=0$, then $u\neq0$,
 We do not care what the lower degree terms are. We already know two solutions of the cubic equation, namely $x_0$ and $x_0$. We know the third solution exists on $\bC$. But by Vieta's lemma, the sum of all solutions is precisely the negation of the coefficient of $x^2$. So the sum is a rational number, and two of the summands are rational, hence the last solution has to be rational! In particular, the tangent line has to intersect with the cubic at a third $\bQ$-rational point!
 The problem is, however, we do not know whether the division in the last step is legal. In other words, we do not know whether $a-bu+cu^2-du^3$ is non-zero or not. Indeed, if it is zero, it means that the third intersection point in $\bP^2_\bQ$ has actually coordinate of the form $[X:Y:0]$. So it is not in the $\bA^2_\bQ$ over which we work. (We work under the assumption $Z\neq 0$.) We have to stop the iteration in this situation. An alternative way to to this is to write down the last rational point we get, homogenize the equation $f$, and pick another affine plane, e.g. $Y\neq 0$. And start the iteration in that affine coordinate again.\\
 If we are lucky enough that we avoid all the obstructions, then the algorithm really gives a third point. However, sometimes the third point coincides with the tangent point. Namely, the tangent line intersects with the cubic at the tangent point with multiplicity three. In this case, the iteration will fall into a cycle. It might be also possible that we have already visited the new point several iterations before, which also means a cycle.\\
-Luckily, the probabilities that the obstructions above only happen in very little possibility. In most cases, we can get an infinite sequence of rational points on the curve by applying the same computation to the new point we get.
+Luckily, the obstructions above only happen in very little possibility. In most cases, we can get an infinite sequence of rational points on the curve by applying the same computation to the new point we get.
 
 \begin{thebibliography}{99}
 	\bibitem{Har} Hartshorne, Robin. Algebraic geometry. Vol. 52. Springer Science \& Business Media, 2013.
